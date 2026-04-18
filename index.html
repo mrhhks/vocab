@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>背單字 AI 字卡 App</title>
+  <title>背單字 AI 字卡</title>
   <style>
     :root{
       --blue:#1677ff;
@@ -14,9 +14,11 @@
       --border:#dbe3ef;
       --danger:#ef4444;
       --success:#10b981;
+      --grayBtn:#eef3fb;
     }
 
     *{box-sizing:border-box;}
+
     body{
       margin:0;
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -34,20 +36,23 @@
     .topbar{
       background:var(--blue);
       color:#fff;
-      padding:20px 16px 18px;
+      padding:24px 16px 22px;
       text-align:center;
       font-size:24px;
-      font-weight:700;
+      font-weight:800;
       position:sticky;
       top:0;
       z-index:10;
+      border-bottom-left-radius:26px;
+      border-bottom-right-radius:26px;
+      box-shadow:0 10px 24px rgba(22,119,255,.18);
     }
 
     .subline{
       font-size:13px;
-      opacity:.9;
-      margin-top:4px;
-      font-weight:500;
+      opacity:.92;
+      margin-top:6px;
+      font-weight:600;
     }
 
     .section{
@@ -56,19 +61,20 @@
 
     .menu-grid{
       display:grid;
-      grid-template-columns:1fr;
+      grid-template-columns:1fr 1fr;
       gap:12px;
+      margin-bottom:14px;
     }
 
     .btn{
       width:100%;
       border:none;
       border-radius:16px;
-      padding:15px 16px;
+      padding:14px 16px;
       background:var(--blue);
       color:#fff;
-      font-size:18px;
-      font-weight:700;
+      font-size:17px;
+      font-weight:800;
       cursor:pointer;
     }
 
@@ -79,7 +85,7 @@
     }
 
     .btn.gray{
-      background:#eef3fb;
+      background:var(--grayBtn);
       color:#1f2937;
       border:1px solid var(--border);
     }
@@ -96,22 +102,22 @@
 
     .card-box{
       background:var(--card);
-      border-radius:20px;
+      border-radius:22px;
       padding:16px;
-      box-shadow:0 10px 25px rgba(19,38,68,.08);
-      border:1px solid #edf2fa;
-      margin-top:16px;
+      box-shadow:0 12px 26px rgba(16,24,40,.08);
+      border:1px solid #eef2f8;
+      margin-top:14px;
     }
 
     .title{
       font-size:22px;
-      font-weight:800;
-      margin:0 0 12px;
+      font-weight:900;
+      margin:0 0 14px;
     }
 
     .label{
       font-size:14px;
-      font-weight:700;
+      font-weight:800;
       margin:12px 0 6px;
       color:#334155;
     }
@@ -143,8 +149,8 @@
     .hint-text{
       color:var(--sub);
       font-size:13px;
-      margin-top:6px;
-      line-height:1.5;
+      margin-top:8px;
+      line-height:1.55;
     }
 
     .hidden{
@@ -152,7 +158,7 @@
     }
 
     .flashcard{
-      min-height:250px;
+      min-height:260px;
       background:linear-gradient(180deg,#ffffff,#f9fbff);
       border-radius:24px;
       border:1px solid var(--border);
@@ -162,11 +168,39 @@
       justify-content:center;
       text-align:center;
       font-size:28px;
-      line-height:1.5;
-      font-weight:700;
+      line-height:1.55;
+      font-weight:800;
       position:relative;
       white-space:pre-wrap;
       word-break:break-word;
+      transition: transform .28s ease, opacity .28s ease, box-shadow .28s ease;
+      touch-action: pan-y;
+      user-select:none;
+      -webkit-user-select:none;
+    }
+
+    .flashcard.dragging{
+      transition:none;
+    }
+
+    .flashcard.swipe-left{
+      transform: translateX(-140px) rotate(-10deg);
+      opacity:0;
+    }
+
+    .flashcard.swipe-right{
+      transform: translateX(140px) rotate(10deg);
+      opacity:0;
+    }
+
+    .flashcard.flip-animate{
+      animation:flipPulse .35s ease;
+    }
+
+    @keyframes flipPulse{
+      0%{ transform:rotateY(0deg) scale(1); }
+      50%{ transform:rotateY(90deg) scale(.97); }
+      100%{ transform:rotateY(0deg) scale(1); }
     }
 
     .flashcard .corner{
@@ -175,7 +209,7 @@
       bottom:12px;
       font-size:14px;
       color:var(--sub);
-      font-weight:700;
+      font-weight:800;
     }
 
     .flashcard .badge{
@@ -187,7 +221,7 @@
       background:#eaf2ff;
       padding:6px 10px;
       border-radius:999px;
-      font-weight:800;
+      font-weight:900;
     }
 
     .study-controls{
@@ -202,6 +236,7 @@
       color:var(--sub);
       font-size:14px;
       text-align:center;
+      line-height:1.5;
     }
 
     .list-tools{
@@ -234,11 +269,11 @@
     .chip{
       display:inline-block;
       font-size:12px;
-      padding:5px 9px;
+      padding:6px 10px;
       border-radius:999px;
       background:#eff6ff;
       color:var(--blue);
-      font-weight:800;
+      font-weight:900;
     }
 
     .front-back{
@@ -253,6 +288,7 @@
       color:var(--sub);
       padding:18px 8px;
       font-size:15px;
+      line-height:1.6;
     }
 
     .toast{
@@ -274,6 +310,27 @@
     .toast.show{
       opacity:1;
     }
+
+    .quiz-input{
+      margin-top:12px;
+    }
+
+    .quiz-feedback{
+      min-height:24px;
+      margin-top:10px;
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .ok{
+      color:var(--success);
+      font-weight:800;
+    }
+
+    .bad{
+      color:var(--danger);
+      font-weight:800;
+    }
   </style>
 </head>
 <body>
@@ -289,16 +346,20 @@
         <button class="btn" onclick="showPage('add')">新增字卡</button>
         <button class="btn" onclick="showPage('study')">開始背卡</button>
         <button class="btn" onclick="showPage('library')">字卡庫</button>
+        <button class="btn" onclick="showPage('quiz')">測驗模式</button>
+        <button class="btn" onclick="showPage('wrong')">錯題集</button>
       </div>
 
       <div id="homePage" class="card-box">
-        <div class="title">你的需求版本</div>
+        <div class="title">功能總覽</div>
         <div class="hint-text">
-          這版支援三種字卡：
+          這版支援：
           <br>1. 自訂字卡
           <br>2. AI 句子字卡
           <br>3. AI 近義 / 反義字卡
-          <br><br>目前是前端智慧生成版，不需要 API 就能先完整體驗流程。
+          <br>4. 背卡滑動練習
+          <br>5. 測驗模式
+          <br>6. 錯題集
         </div>
       </div>
 
@@ -323,7 +384,7 @@
         <div id="sentenceFields" class="hidden">
           <div class="label">輸入單字</div>
           <input id="sentenceWord" placeholder="例如：maintain" />
-          <div class="hint-text">背面會是單字，正面會自動生成包含該單字的挖空句，只保留字首。</div>
+          <div class="hint-text">背面會是單字，正面會自動生成較合理的挖空句，只保留字首。</div>
         </div>
 
         <div id="synFields" class="hidden">
@@ -336,7 +397,7 @@
             <option value="synonym">只要近義詞</option>
             <option value="antonym">只要反義詞</option>
           </select>
-          <div class="hint-text">正面會顯示近義詞 / 反義詞，並在後面標註類型。</div>
+          <div class="hint-text">正面會顯示近義詞 / 反義詞，並標註類型。</div>
         </div>
 
         <div class="row" style="margin-top:14px;">
@@ -368,28 +429,92 @@
 
         <div id="libraryList"></div>
       </div>
+
+      <div id="quizPage" class="card-box hidden">
+        <div class="title">測驗模式</div>
+        <div id="quizArea"></div>
+      </div>
+
+      <div id="wrongPage" class="card-box hidden">
+        <div class="title">錯題集</div>
+        <div id="wrongList"></div>
+      </div>
     </div>
   </div>
 
   <div id="toast" class="toast"></div>
 
   <script>
-    const STORAGE_KEY = "ai_vocab_flashcards_v2";
+    const STORAGE_KEY = "ai_vocab_flashcards_v3";
+    const WRONG_KEY = "wrong_book_v1";
 
     let cards = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    let wrongBook = JSON.parse(localStorage.getItem(WRONG_KEY) || "[]");
+
     let currentStudyIndex = 0;
     let currentFlipped = false;
+    let studyDeck = [];
 
-    const sentenceTemplates = [
-      "She tried to WORD her balance during the storm.",
-      "It is important to WORD a healthy lifestyle.",
-      "The teacher asked us to WORD our focus during the test.",
-      "He managed to WORD his calm in a difficult situation.",
-      "We need to WORD this system carefully.",
-      "They plan to WORD the quality of their work.",
-      "You should WORD a positive attitude every day.",
-      "The team worked hard to WORD good communication."
-    ];
+    let quizDeck = [];
+    let currentQuizIndex = 0;
+
+    const sentenceBank = {
+      apple: [
+        "An a____ a day may keep the doctor away.",
+        "She ate an a____ after lunch.",
+        "The boy picked a red a____ from the tree."
+      ],
+      maintain: [
+        "We need to m_______ this system carefully.",
+        "It is important to m_______ a healthy lifestyle.",
+        "She works hard to m_______ good relationships with others."
+      ],
+      rapid: [
+        "There was a r____ increase in population.",
+        "The patient showed r____ improvement after treatment.",
+        "Technology has gone through r____ change in recent years."
+      ],
+      diligent: [
+        "She is very d_______ in her studies.",
+        "The teacher praised him for being d_______ and responsible.",
+        "A d_______ student reviews lessons every day."
+      ],
+      hesitate: [
+        "Do not h_______ to ask for help.",
+        "She seemed to h_______ before answering the question.",
+        "He did not h_______ to speak up."
+      ],
+      achieve: [
+        "She worked hard to a_______ her goal.",
+        "You can a_______ success through practice.",
+        "They hope to a_______ better results this year."
+      ],
+      apparent: [
+        "It became a_______ that he was upset.",
+        "The difference was immediately a_______.",
+        "Her disappointment was a_______ from her expression."
+      ],
+      genuine: [
+        "She gave me a g_______ smile.",
+        "His concern for others was g_______ and sincere.",
+        "This museum displays a g_______ ancient artifact."
+      ],
+      defend: [
+        "Soldiers must d______ their country.",
+        "He spoke up to d______ his opinion.",
+        "The lawyer tried to d______ her client in court."
+      ],
+      condemn: [
+        "Many people c______ violence strongly.",
+        "The judge c______ the unfair action.",
+        "Leaders should c______ corruption."
+      ],
+      scatter: [
+        "The wind began to s______ the leaves.",
+        "The children s______ across the playground.",
+        "Do not s______ your books all over the floor."
+      ]
+    };
 
     const aiWordData = {
       rapid: {
@@ -438,6 +563,10 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
     }
 
+    function saveWrongBook(){
+      localStorage.setItem(WRONG_KEY, JSON.stringify(wrongBook));
+    }
+
     function showToast(message){
       const t = document.getElementById("toast");
       t.textContent = message;
@@ -450,16 +579,38 @@
       document.getElementById("addPage").classList.add("hidden");
       document.getElementById("studyPage").classList.add("hidden");
       document.getElementById("libraryPage").classList.add("hidden");
+      document.getElementById("quizPage").classList.add("hidden");
+      document.getElementById("wrongPage").classList.add("hidden");
 
-      if(page === "home") document.getElementById("homePage").classList.remove("hidden");
-      if(page === "add") document.getElementById("addPage").classList.remove("hidden");
+      if(page === "home"){
+        document.getElementById("homePage").classList.remove("hidden");
+      }
+
+      if(page === "add"){
+        document.getElementById("addPage").classList.remove("hidden");
+      }
+
       if(page === "study"){
         document.getElementById("studyPage").classList.remove("hidden");
+        studyDeck = [...cards];
+        currentStudyIndex = 0;
+        currentFlipped = false;
         renderStudyCard();
       }
+
       if(page === "library"){
         document.getElementById("libraryPage").classList.remove("hidden");
         renderLibrary();
+      }
+
+      if(page === "quiz"){
+        document.getElementById("quizPage").classList.remove("hidden");
+        startQuiz();
+      }
+
+      if(page === "wrong"){
+        document.getElementById("wrongPage").classList.remove("hidden");
+        renderWrongBook();
       }
     }
 
@@ -484,39 +635,35 @@
       return word[0] + "_".repeat(word.length - 1);
     }
 
-    function escapeRegExp(str){
-      return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    function fallbackWordSet(word){
+      const first = word[0]?.toLowerCase() || "a";
+      return {
+        synonyms: [`${first}lternative`, `${first}similar`, `${first}related`],
+        antonyms: [`not-${word}`, `opposite-${word}`, `anti-${word}`]
+      };
     }
 
     function generateSentenceCard(word){
-      const clean = normalizeWord(word);
-      const template = sentenceTemplates[Math.floor(Math.random() * sentenceTemplates.length)];
-      const fullSentence = template.replace("WORD", clean);
-      const blank = makeBlankWord(clean);
+      const clean = normalizeWord(word).toLowerCase();
+      const options = sentenceBank[clean];
 
-      const re = new RegExp("\\b" + escapeRegExp(clean) + "\\b", "i");
-      const maskedSentence = fullSentence.replace(re, blank);
+      let maskedSentence = "";
+      if (options && options.length > 0) {
+        maskedSentence = options[Math.floor(Math.random() * options.length)];
+      } else {
+        const blank = makeBlankWord(clean);
+        maskedSentence = `This word starts with ${clean[0]}: ${blank}`;
+      }
 
       return {
         id: Date.now() + Math.random(),
         type: "ai_sentence",
         frontContent: maskedSentence,
         backContent: clean,
-        hintLetter: clean[0]?.toLowerCase() || "",
-        createdAt: new Date().toISOString()
-      };
-    }
-
-    function capitalize(word){
-      if(!word) return "";
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    }
-
-    function fallbackWordSet(word){
-      const first = word[0]?.toLowerCase() || "a";
-      return {
-        synonyms: [`${first}lternative`, `${first}similar`, `${first}related`],
-        antonyms: [`not-${word}`, `opposite-${word}`, `anti-${word}`]
+        hintLetter: clean[0] || "",
+        createdAt: new Date().toISOString(),
+        mastery: 0,
+        wrongCount: 0
       };
     }
 
@@ -538,7 +685,9 @@
         frontContent: lines.join("\n"),
         backContent: clean,
         hintLetter: clean[0] || "",
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        mastery: 0,
+        wrongCount: 0
       };
     }
 
@@ -549,6 +698,7 @@
       if(type === "custom"){
         const front = document.getElementById("customFront").value.trim();
         const back = document.getElementById("customBack").value.trim();
+
         if(!front || !back){
           showToast("請完整輸入正面和背面");
           return;
@@ -560,7 +710,9 @@
           frontContent: front,
           backContent: back,
           hintLetter: back[0]?.toLowerCase() || "",
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          mastery: 0,
+          wrongCount: 0
         };
       }
 
@@ -608,71 +760,142 @@
     function renderStudyCard(){
       const area = document.getElementById("studyArea");
 
-      if(cards.length === 0){
-        area.innerHTML = `
-          <div class="empty">目前還沒有字卡，先去新增幾張吧。</div>
-        `;
+      if(studyDeck.length === 0){
+        area.innerHTML = `<div class="empty">本輪背卡完成。</div>`;
         return;
       }
 
-      if(currentStudyIndex >= cards.length) currentStudyIndex = 0;
-      const card = cards[currentStudyIndex];
+      if(currentStudyIndex >= studyDeck.length) currentStudyIndex = 0;
+      const card = studyDeck[currentStudyIndex];
       const showText = currentFlipped ? card.backContent : card.frontContent;
 
       area.innerHTML = `
-        <div class="flashcard" onclick="flipStudyCard()">
+        <div id="studyCard" class="flashcard" onclick="flipStudyCard()">
           <div class="badge">${typeLabel(card.type)}</div>
-          ${showText}
+          ${escapeHtml(showText)}
           <div class="corner">字首：${card.hintLetter || "-"}</div>
         </div>
 
         <div class="study-controls">
-          <button class="btn secondary" onclick="prevCard()">上一張</button>
-          <button class="btn" onclick="nextCard()">下一張</button>
+          <button class="btn secondary" onclick="markKnown()">左滑：會了</button>
+          <button class="btn" onclick="markUnknown()">右滑：不會</button>
         </div>
 
         <div class="study-controls">
+          <button class="btn gray" onclick="prevCard()">上一張</button>
           <button class="btn gray" onclick="flipStudyCard()">翻面</button>
-          <button class="btn gray" onclick="shuffleCards()">隨機排序</button>
         </div>
 
         <div class="study-meta">
-          第 ${currentStudyIndex + 1} / ${cards.length} 張　
+          第 ${currentStudyIndex + 1} / ${studyDeck.length} 張　
           目前顯示：${currentFlipped ? "背面" : "正面"}
+          <br>左滑代表會了，右滑代表不會
         </div>
       `;
+
+      attachSwipeEvents();
     }
 
     function flipStudyCard(){
-      if(cards.length === 0) return;
+      if(studyDeck.length === 0) return;
       currentFlipped = !currentFlipped;
-      renderStudyCard();
-    }
-
-    function nextCard(){
-      if(cards.length === 0) return;
-      currentStudyIndex = (currentStudyIndex + 1) % cards.length;
-      currentFlipped = false;
-      renderStudyCard();
+      const el = document.getElementById("studyCard");
+      if(el){
+        el.classList.remove("flip-animate");
+        void el.offsetWidth;
+        el.classList.add("flip-animate");
+      }
+      setTimeout(() => renderStudyCard(), 120);
     }
 
     function prevCard(){
-      if(cards.length === 0) return;
-      currentStudyIndex = (currentStudyIndex - 1 + cards.length) % cards.length;
+      if(studyDeck.length === 0) return;
+      currentStudyIndex = (currentStudyIndex - 1 + studyDeck.length) % studyDeck.length;
       currentFlipped = false;
       renderStudyCard();
     }
 
-    function shuffleCards(){
-      for(let i = cards.length - 1; i > 0; i--){
-        const j = Math.floor(Math.random() * (i + 1));
-        [cards[i], cards[j]] = [cards[j], cards[i]];
+    function attachSwipeEvents(){
+      const el = document.getElementById("studyCard");
+      if(!el) return;
+
+      let startX = 0;
+      let currentX = 0;
+      let dragging = false;
+
+      el.ontouchstart = (e) => {
+        startX = e.touches[0].clientX;
+        dragging = true;
+        el.classList.add("dragging");
+      };
+
+      el.ontouchmove = (e) => {
+        if(!dragging) return;
+        currentX = e.touches[0].clientX - startX;
+        el.style.transform = `translateX(${currentX}px) rotate(${currentX * 0.05}deg)`;
+      };
+
+      el.ontouchend = () => {
+        dragging = false;
+        el.classList.remove("dragging");
+
+        if(currentX < -80){
+          el.classList.add("swipe-left");
+          setTimeout(() => markKnown(true), 220);
+        } else if(currentX > 80){
+          el.classList.add("swipe-right");
+          setTimeout(() => markUnknown(true), 220);
+        } else {
+          el.style.transform = "";
+        }
+        currentX = 0;
+      };
+    }
+
+    function markKnown(){
+      if(studyDeck.length === 0) return;
+
+      const card = studyDeck[currentStudyIndex];
+      card.mastery = (card.mastery || 0) + 1;
+
+      const original = cards.find(c => String(c.id) === String(card.id));
+      if(original){
+        original.mastery = (original.mastery || 0) + 1;
+        saveCards();
       }
-      saveCards();
-      currentStudyIndex = 0;
+
+      studyDeck.splice(currentStudyIndex, 1);
+
+      if(studyDeck.length === 0){
+        document.getElementById("studyArea").innerHTML = `<div class="empty">本輪背卡完成。</div>`;
+        return;
+      }
+
+      if(currentStudyIndex >= studyDeck.length) currentStudyIndex = 0;
       currentFlipped = false;
       renderStudyCard();
-      showToast("已隨機排序");
+    }
+
+    function markUnknown(){
+      if(studyDeck.length === 0) return;
+
+      const card = studyDeck[currentStudyIndex];
+      card.wrongCount = (card.wrongCount || 0) + 1;
+
+      const original = cards.find(c => String(c.id) === String(card.id));
+      if(original){
+        original.wrongCount = (original.wrongCount || 0) + 1;
+        saveCards();
+      }
+
+      studyDeck.splice(currentStudyIndex, 1);
+
+      let insertIndex = Math.floor(Math.random() * (studyDeck.length + 1));
+      if(insertIndex < 1) insertIndex = 1;
+      studyDeck.splice(insertIndex, 0, card);
+
+      currentFlipped = false;
+      renderStudyCard();
     }
 
     function renderLibrary(){
@@ -702,9 +925,144 @@
           </div>
           <div class="front-back"><strong>正面：</strong>${escapeHtml(card.frontContent)}</div>
           <div class="front-back" style="margin-top:6px;"><strong>背面：</strong>${escapeHtml(card.backContent)}</div>
-          <div class="hint-text" style="margin-top:8px;">字首提示：${escapeHtml(card.hintLetter || "-")}</div>
+          <div class="hint-text" style="margin-top:8px;">
+            字首提示：${escapeHtml(card.hintLetter || "-")}
+            <br>會了次數：${card.mastery || 0}　不會次數：${card.wrongCount || 0}
+          </div>
         </div>
       `).join("");
+    }
+
+    function deleteCard(id){
+      cards = cards.filter(card => String(card.id) !== String(id));
+      saveCards();
+      if(currentStudyIndex >= cards.length) currentStudyIndex = 0;
+      renderLibrary();
+      showToast("已刪除字卡");
+    }
+
+    function clearAllCards(){
+      if(!confirm("確定要清空全部字卡嗎？")) return;
+      cards = [];
+      saveCards();
+      studyDeck = [];
+      currentStudyIndex = 0;
+      currentFlipped = false;
+      renderLibrary();
+      renderStudyCard();
+      showToast("已清空全部字卡");
+    }
+
+    function startQuiz(){
+      const area = document.getElementById("quizArea");
+
+      if(cards.length === 0){
+        area.innerHTML = `<div class="empty">目前沒有字卡可以測驗。</div>`;
+        return;
+      }
+
+      quizDeck = [...cards];
+      currentQuizIndex = 0;
+      renderQuizQuestion();
+    }
+
+    function renderQuizQuestion(){
+      const area = document.getElementById("quizArea");
+
+      if(currentQuizIndex >= quizDeck.length){
+        area.innerHTML = `<div class="empty">測驗完成。</div>`;
+        return;
+      }
+
+      const card = quizDeck[currentQuizIndex];
+
+      area.innerHTML = `
+        <div class="flashcard" style="min-height:190px; font-size:24px;">
+          ${escapeHtml(card.frontContent)}
+          <div class="corner">第 ${currentQuizIndex + 1} / ${quizDeck.length} 題</div>
+        </div>
+
+        <div class="label">請輸入背面答案</div>
+        <input id="quizAnswer" class="quiz-input" placeholder="輸入答案" />
+
+        <div class="study-controls">
+          <button class="btn" onclick="submitQuizAnswer()">送出答案</button>
+          <button class="btn secondary" onclick="showQuizAnswer()">看答案</button>
+        </div>
+
+        <div id="quizFeedback" class="quiz-feedback"></div>
+      `;
+    }
+
+    function submitQuizAnswer(){
+      const card = quizDeck[currentQuizIndex];
+      const input = document.getElementById("quizAnswer").value.trim().toLowerCase();
+      const answer = card.backContent.trim().toLowerCase();
+      const feedback = document.getElementById("quizFeedback");
+
+      if(input === answer){
+        feedback.innerHTML = `<span class="ok">答對了</span>`;
+      } else {
+        feedback.innerHTML = `<span class="bad">答錯了，正確答案是：${escapeHtml(card.backContent)}</span>`;
+        collectWrongAnswer(card, input);
+      }
+
+      setTimeout(() => {
+        currentQuizIndex++;
+        renderQuizQuestion();
+      }, 900);
+    }
+
+    function showQuizAnswer(){
+      const card = quizDeck[currentQuizIndex];
+      const feedback = document.getElementById("quizFeedback");
+      feedback.innerHTML = `正確答案：${escapeHtml(card.backContent)}`;
+    }
+
+    function collectWrongAnswer(card, userAnswer){
+      const exists = wrongBook.find(item => String(item.id) === String(card.id));
+
+      if(exists){
+        exists.wrongTimes = (exists.wrongTimes || 1) + 1;
+        exists.lastUserAnswer = userAnswer;
+      } else {
+        wrongBook.unshift({
+          ...card,
+          wrongTimes: 1,
+          lastUserAnswer: userAnswer
+        });
+      }
+
+      saveWrongBook();
+    }
+
+    function renderWrongBook(){
+      const box = document.getElementById("wrongList");
+
+      if(wrongBook.length === 0){
+        box.innerHTML = `<div class="empty">目前沒有錯題。</div>`;
+        return;
+      }
+
+      box.innerHTML = wrongBook.map(item => `
+        <div class="library-item">
+          <div class="library-top">
+            <span class="chip">錯 ${item.wrongTimes} 次</span>
+            <button class="btn danger small" onclick="removeWrongItem('${item.id}')">刪除</button>
+          </div>
+          <div class="front-back"><strong>正面：</strong>${escapeHtml(item.frontContent)}</div>
+          <div class="front-back" style="margin-top:6px;"><strong>正解：</strong>${escapeHtml(item.backContent)}</div>
+          <div class="hint-text" style="margin-top:8px;">
+            上次你的答案：${escapeHtml(item.lastUserAnswer || "-")}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function removeWrongItem(id){
+      wrongBook = wrongBook.filter(item => String(item.id) !== String(id));
+      saveWrongBook();
+      renderWrongBook();
     }
 
     function escapeHtml(text){
@@ -715,26 +1073,6 @@
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;")
         .replaceAll("\n", "<br>");
-    }
-
-    function deleteCard(id){
-      cards = cards.filter(card => String(card.id) !== String(id));
-      saveCards();
-      if(currentStudyIndex >= cards.length) currentStudyIndex = 0;
-      renderLibrary();
-      renderStudyCard();
-      showToast("已刪除字卡");
-    }
-
-    function clearAllCards(){
-      if(!confirm("確定要清空全部字卡嗎？")) return;
-      cards = [];
-      saveCards();
-      currentStudyIndex = 0;
-      currentFlipped = false;
-      renderLibrary();
-      renderStudyCard();
-      showToast("已清空全部字卡");
     }
 
     toggleFormByType();
