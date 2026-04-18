@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>背單字 AI 字卡 App</title>
+  <style>
+    :root{
+      --blue:#1677ff;
+      --bg:#f3f6fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --sub:#6b7280;
+      --border:#dbe3ef;
+      --danger:#ef4444;
+      --success:#10b981;
+    }
+
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .app{
+      max-width:560px;
+      margin:0 auto;
+      min-height:100vh;
+      padding-bottom:32px;
+    }
+
+    .topbar{
+      background:var(--blue);
+      color:#fff;
+      padding:20px 16px 18px;
+      text-align:center;
+      font-size:24px;
+      font-weight:700;
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+
+    .subline{
+      font-size:13px;
+      opacity:.9;
+      margin-top:4px;
+      font-weight:500;
+    }
+
+    .section{
+      padding:16px;
+    }
+
+    .menu-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:16px;
+      padding:15px 16px;
+      background:var(--blue);
+      color:#fff;
+      font-size:18px;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .btn.secondary{
+      background:#fff;
+      color:var(--blue);
+      border:1.5px solid var(--blue);
+    }
+
+    .btn.gray{
+      background:#eef3fb;
+      color:#1f2937;
+      border:1px solid var(--border);
+    }
+
+    .btn.danger{
+      background:var(--danger);
+    }
+
+    .btn.small{
+      padding:10px 12px;
+      font-size:14px;
+      border-radius:12px;
+    }
+
+    .card-box{
+      background:var(--card);
+      border-radius:20px;
+      padding:16px;
+      box-shadow:0 10px 25px rgba(19,38,68,.08);
+      border:1px solid #edf2fa;
+      margin-top:16px;
+    }
+
+    .title{
+      font-size:22px;
+      font-weight:800;
+      margin:0 0 12px;
+    }
+
+    .label{
+      font-size:14px;
+      font-weight:700;
+      margin:12px 0 6px;
+      color:#334155;
+    }
+
+    input, select, textarea{
+      width:100%;
+      padding:13px 14px;
+      border-radius:14px;
+      border:1.4px solid var(--border);
+      background:#fff;
+      font-size:16px;
+      outline:none;
+    }
+
+    textarea{
+      min-height:96px;
+      resize:vertical;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+    }
+
+    .row > *{
+      flex:1;
+    }
+
+    .hint-text{
+      color:var(--sub);
+      font-size:13px;
+      margin-top:6px;
+      line-height:1.5;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    .flashcard{
+      min-height:250px;
+      background:linear-gradient(180deg,#ffffff,#f9fbff);
+      border-radius:24px;
+      border:1px solid var(--border);
+      padding:22px 20px 42px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-size:28px;
+      line-height:1.5;
+      font-weight:700;
+      position:relative;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .flashcard .corner{
+      position:absolute;
+      right:14px;
+      bottom:12px;
+      font-size:14px;
+      color:var(--sub);
+      font-weight:700;
+    }
+
+    .flashcard .badge{
+      position:absolute;
+      left:14px;
+      top:12px;
+      font-size:12px;
+      color:var(--blue);
+      background:#eaf2ff;
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:800;
+    }
+
+    .study-controls{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .study-meta{
+      margin-top:12px;
+      color:var(--sub);
+      font-size:14px;
+      text-align:center;
+    }
+
+    .list-tools{
+      display:grid;
+      gap:10px;
+    }
+
+    .filter-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .library-item{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:14px;
+      margin-top:12px;
+    }
+
+    .library-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:8px;
+    }
+
+    .chip{
+      display:inline-block;
+      font-size:12px;
+      padding:5px 9px;
+      border-radius:999px;
+      background:#eff6ff;
+      color:var(--blue);
+      font-weight:800;
+    }
+
+    .front-back{
+      line-height:1.6;
+      font-size:16px;
+      word-break:break-word;
+      white-space:pre-wrap;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--sub);
+      padding:18px 8px;
+      font-size:15px;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:24px;
+      background:#111827;
+      color:#fff;
+      padding:12px 16px;
+      border-radius:999px;
+      font-size:14px;
+      z-index:30;
+      opacity:0;
+      pointer-events:none;
+      transition:.25s ease;
+    }
+
+    .toast.show{
+      opacity:1;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      背單字 AI 字卡
+      <div class="subline">手機版網頁 App</div>
+    </div>
+
+    <div class="section">
+      <div class="menu-grid">
+        <button class="btn" onclick="showPage('home')">首頁</button>
+        <button class="btn" onclick="showPage('add')">新增字卡</button>
+        <button class="btn" onclick="showPage('study')">開始背卡</button>
+        <button class="btn" onclick="showPage('library')">字卡庫</button>
+      </div>
+
+      <div id="homePage" class="card-box">
+        <div class="title">你的需求版本</div>
+        <div class="hint-text">
+          這版支援三種字卡：
+          <br>1. 自訂字卡
+          <br>2. AI 句子字卡
+          <br>3. AI 近義 / 反義字卡
+          <br><br>目前是前端智慧生成版，不需要 API 就能先完整體驗流程。
+        </div>
+      </div>
+
+      <div id="addPage" class="card-box hidden">
+        <div class="title">新增字卡</div>
+
+        <div class="label">字卡類型</div>
+        <select id="cardType" onchange="toggleFormByType()">
+          <option value="custom">自訂字卡</option>
+          <option value="ai_sentence">AI 句子字卡</option>
+          <option value="ai_syn_ant">AI 近反義詞字卡</option>
+        </select>
+
+        <div id="customFields">
+          <div class="label">正面內容</div>
+          <textarea id="customFront" placeholder="例如：勤奮的"></textarea>
+
+          <div class="label">背面內容</div>
+          <input id="customBack" placeholder="例如：diligent" />
+        </div>
+
+        <div id="sentenceFields" class="hidden">
+          <div class="label">輸入單字</div>
+          <input id="sentenceWord" placeholder="例如：maintain" />
+          <div class="hint-text">背面會是單字，正面會自動生成包含該單字的挖空句，只保留字首。</div>
+        </div>
+
+        <div id="synFields" class="hidden">
+          <div class="label">輸入單字</div>
+          <input id="synWord" placeholder="例如：rapid" />
+
+          <div class="label">顯示模式</div>
+          <select id="synMode">
+            <option value="both">近義 + 反義</option>
+            <option value="synonym">只要近義詞</option>
+            <option value="antonym">只要反義詞</option>
+          </select>
+          <div class="hint-text">正面會顯示近義詞 / 反義詞，並在後面標註類型。</div>
+        </div>
+
+        <div class="row" style="margin-top:14px;">
+          <button class="btn" onclick="createCard()">建立字卡</button>
+          <button class="btn secondary" onclick="clearAddForm()">清空</button>
+        </div>
+      </div>
+
+      <div id="studyPage" class="card-box hidden">
+        <div class="title">開始背卡</div>
+        <div id="studyArea"></div>
+      </div>
+
+      <div id="libraryPage" class="card-box hidden">
+        <div class="title">字卡庫</div>
+
+        <div class="list-tools">
+          <input id="searchInput" placeholder="搜尋正面、背面內容" oninput="renderLibrary()" />
+          <div class="filter-row">
+            <select id="filterType" onchange="renderLibrary()">
+              <option value="all">全部類型</option>
+              <option value="custom">自訂字卡</option>
+              <option value="ai_sentence">AI 句子字卡</option>
+              <option value="ai_syn_ant">AI 近反義詞字卡</option>
+            </select>
+            <button class="btn gray small" onclick="clearAllCards()">清空全部字卡</button>
+          </div>
+        </div>
+
+        <div id="libraryList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const STORAGE_KEY = "ai_vocab_flashcards_v2";
+
+    let cards = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    let currentStudyIndex = 0;
+    let currentFlipped = false;
+
+    const sentenceTemplates = [
+      "She tried to WORD her balance during the storm.",
+      "It is important to WORD a healthy lifestyle.",
+      "The teacher asked us to WORD our focus during the test.",
+      "He managed to WORD his calm in a difficult situation.",
+      "We need to WORD this system carefully.",
+      "They plan to WORD the quality of their work.",
+      "You should WORD a positive attitude every day.",
+      "The team worked hard to WORD good communication."
+    ];
+
+    const aiWordData = {
+      rapid: {
+        synonyms: ["quick", "fast", "swift"],
+        antonyms: ["slow", "gradual", "sluggish"]
+      },
+      diligent: {
+        synonyms: ["hardworking", "industrious", "studious"],
+        antonyms: ["lazy", "idle", "careless"]
+      },
+      maintain: {
+        synonyms: ["preserve", "sustain", "keep"],
+        antonyms: ["neglect", "abandon", "disrupt"]
+      },
+      hesitate: {
+        synonyms: ["pause", "waver", "doubt"],
+        antonyms: ["decide", "act", "proceed"]
+      },
+      achieve: {
+        synonyms: ["accomplish", "attain", "complete"],
+        antonyms: ["fail", "lose", "miss"]
+      },
+      apparent: {
+        synonyms: ["obvious", "clear", "evident"],
+        antonyms: ["hidden", "unclear", "obscure"]
+      },
+      genuine: {
+        synonyms: ["real", "authentic", "sincere"],
+        antonyms: ["fake", "false", "artificial"]
+      },
+      defend: {
+        synonyms: ["protect", "guard", "support"],
+        antonyms: ["attack", "harm", "abandon"]
+      },
+      condemn: {
+        synonyms: ["criticize", "denounce", "blame"],
+        antonyms: ["praise", "approve", "support"]
+      },
+      scatter: {
+        synonyms: ["spread", "disperse", "splash"],
+        antonyms: ["gather", "collect", "assemble"]
+      }
+    };
+
+    function saveCards(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+    }
+
+    function showToast(message){
+      const t = document.getElementById("toast");
+      t.textContent = message;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 1600);
+    }
+
+    function showPage(page){
+      document.getElementById("homePage").classList.add("hidden");
+      document.getElementById("addPage").classList.add("hidden");
+      document.getElementById("studyPage").classList.add("hidden");
+      document.getElementById("libraryPage").classList.add("hidden");
+
+      if(page === "home") document.getElementById("homePage").classList.remove("hidden");
+      if(page === "add") document.getElementById("addPage").classList.remove("hidden");
+      if(page === "study"){
+        document.getElementById("studyPage").classList.remove("hidden");
+        renderStudyCard();
+      }
+      if(page === "library"){
+        document.getElementById("libraryPage").classList.remove("hidden");
+        renderLibrary();
+      }
+    }
+
+    function toggleFormByType(){
+      const type = document.getElementById("cardType").value;
+      document.getElementById("customFields").classList.add("hidden");
+      document.getElementById("sentenceFields").classList.add("hidden");
+      document.getElementById("synFields").classList.add("hidden");
+
+      if(type === "custom") document.getElementById("customFields").classList.remove("hidden");
+      if(type === "ai_sentence") document.getElementById("sentenceFields").classList.remove("hidden");
+      if(type === "ai_syn_ant") document.getElementById("synFields").classList.remove("hidden");
+    }
+
+    function normalizeWord(word){
+      return (word || "").trim();
+    }
+
+    function makeBlankWord(word){
+      if(!word) return "";
+      if(word.length === 1) return word[0];
+      return word[0] + "_".repeat(word.length - 1);
+    }
+
+    function escapeRegExp(str){
+      return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    function generateSentenceCard(word){
+      const clean = normalizeWord(word);
+      const template = sentenceTemplates[Math.floor(Math.random() * sentenceTemplates.length)];
+      const fullSentence = template.replace("WORD", clean);
+      const blank = makeBlankWord(clean);
+
+      const re = new RegExp("\\b" + escapeRegExp(clean) + "\\b", "i");
+      const maskedSentence = fullSentence.replace(re, blank);
+
+      return {
+        id: Date.now() + Math.random(),
+        type: "ai_sentence",
+        frontContent: maskedSentence,
+        backContent: clean,
+        hintLetter: clean[0]?.toLowerCase() || "",
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    function capitalize(word){
+      if(!word) return "";
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }
+
+    function fallbackWordSet(word){
+      const first = word[0]?.toLowerCase() || "a";
+      return {
+        synonyms: [`${first}lternative`, `${first}similar`, `${first}related`],
+        antonyms: [`not-${word}`, `opposite-${word}`, `anti-${word}`]
+      };
+    }
+
+    function generateSynAntCard(word, mode){
+      const clean = normalizeWord(word).toLowerCase();
+      const data = aiWordData[clean] || fallbackWordSet(clean);
+
+      let lines = [];
+      if(mode === "both" || mode === "synonym"){
+        data.synonyms.forEach(w => lines.push(`${w} (近義)`));
+      }
+      if(mode === "both" || mode === "antonym"){
+        data.antonyms.forEach(w => lines.push(`${w} (反義)`));
+      }
+
+      return {
+        id: Date.now() + Math.random(),
+        type: "ai_syn_ant",
+        frontContent: lines.join("\n"),
+        backContent: clean,
+        hintLetter: clean[0] || "",
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    function createCard(){
+      const type = document.getElementById("cardType").value;
+      let newCard = null;
+
+      if(type === "custom"){
+        const front = document.getElementById("customFront").value.trim();
+        const back = document.getElementById("customBack").value.trim();
+        if(!front || !back){
+          showToast("請完整輸入正面和背面");
+          return;
+        }
+
+        newCard = {
+          id: Date.now() + Math.random(),
+          type: "custom",
+          frontContent: front,
+          backContent: back,
+          hintLetter: back[0]?.toLowerCase() || "",
+          createdAt: new Date().toISOString()
+        };
+      }
+
+      if(type === "ai_sentence"){
+        const word = document.getElementById("sentenceWord").value.trim();
+        if(!word){
+          showToast("請輸入單字");
+          return;
+        }
+        newCard = generateSentenceCard(word);
+      }
+
+      if(type === "ai_syn_ant"){
+        const word = document.getElementById("synWord").value.trim();
+        const mode = document.getElementById("synMode").value;
+        if(!word){
+          showToast("請輸入單字");
+          return;
+        }
+        newCard = generateSynAntCard(word, mode);
+      }
+
+      cards.unshift(newCard);
+      saveCards();
+      clearAddForm();
+      renderLibrary();
+      showToast("字卡建立成功");
+    }
+
+    function clearAddForm(){
+      document.getElementById("customFront").value = "";
+      document.getElementById("customBack").value = "";
+      document.getElementById("sentenceWord").value = "";
+      document.getElementById("synWord").value = "";
+      document.getElementById("synMode").value = "both";
+    }
+
+    function typeLabel(type){
+      if(type === "custom") return "自訂字卡";
+      if(type === "ai_sentence") return "AI 句子";
+      if(type === "ai_syn_ant") return "AI 近反義";
+      return type;
+    }
+
+    function renderStudyCard(){
+      const area = document.getElementById("studyArea");
+
+      if(cards.length === 0){
+        area.innerHTML = `
+          <div class="empty">目前還沒有字卡，先去新增幾張吧。</div>
+        `;
+        return;
+      }
+
+      if(currentStudyIndex >= cards.length) currentStudyIndex = 0;
+      const card = cards[currentStudyIndex];
+      const showText = currentFlipped ? card.backContent : card.frontContent;
+
+      area.innerHTML = `
+        <div class="flashcard" onclick="flipStudyCard()">
+          <div class="badge">${typeLabel(card.type)}</div>
+          ${showText}
+          <div class="corner">字首：${card.hintLetter || "-"}</div>
+        </div>
+
+        <div class="study-controls">
+          <button class="btn secondary" onclick="prevCard()">上一張</button>
+          <button class="btn" onclick="nextCard()">下一張</button>
+        </div>
+
+        <div class="study-controls">
+          <button class="btn gray" onclick="flipStudyCard()">翻面</button>
+          <button class="btn gray" onclick="shuffleCards()">隨機排序</button>
+        </div>
+
+        <div class="study-meta">
+          第 ${currentStudyIndex + 1} / ${cards.length} 張　
+          目前顯示：${currentFlipped ? "背面" : "正面"}
+        </div>
+      `;
+    }
+
+    function flipStudyCard(){
+      if(cards.length === 0) return;
+      currentFlipped = !currentFlipped;
+      renderStudyCard();
+    }
+
+    function nextCard(){
+      if(cards.length === 0) return;
+      currentStudyIndex = (currentStudyIndex + 1) % cards.length;
+      currentFlipped = false;
+      renderStudyCard();
+    }
+
+    function prevCard(){
+      if(cards.length === 0) return;
+      currentStudyIndex = (currentStudyIndex - 1 + cards.length) % cards.length;
+      currentFlipped = false;
+      renderStudyCard();
+    }
+
+    function shuffleCards(){
+      for(let i = cards.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [cards[i], cards[j]] = [cards[j], cards[i]];
+      }
+      saveCards();
+      currentStudyIndex = 0;
+      currentFlipped = false;
+      renderStudyCard();
+      showToast("已隨機排序");
+    }
+
+    function renderLibrary(){
+      const keyword = document.getElementById("searchInput")?.value.trim().toLowerCase() || "";
+      const filterType = document.getElementById("filterType")?.value || "all";
+      const list = document.getElementById("libraryList");
+
+      let filtered = cards.filter(card => {
+        const matchKeyword = !keyword ||
+          card.frontContent.toLowerCase().includes(keyword) ||
+          card.backContent.toLowerCase().includes(keyword);
+
+        const matchType = filterType === "all" || card.type === filterType;
+        return matchKeyword && matchType;
+      });
+
+      if(filtered.length === 0){
+        list.innerHTML = `<div class="empty">找不到符合條件的字卡。</div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(card => `
+        <div class="library-item">
+          <div class="library-top">
+            <span class="chip">${typeLabel(card.type)}</span>
+            <button class="btn danger small" onclick="deleteCard('${card.id}')">刪除</button>
+          </div>
+          <div class="front-back"><strong>正面：</strong>${escapeHtml(card.frontContent)}</div>
+          <div class="front-back" style="margin-top:6px;"><strong>背面：</strong>${escapeHtml(card.backContent)}</div>
+          <div class="hint-text" style="margin-top:8px;">字首提示：${escapeHtml(card.hintLetter || "-")}</div>
+        </div>
+      `).join("");
+    }
+
+    function escapeHtml(text){
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;")
+        .replaceAll("\n", "<br>");
+    }
+
+    function deleteCard(id){
+      cards = cards.filter(card => String(card.id) !== String(id));
+      saveCards();
+      if(currentStudyIndex >= cards.length) currentStudyIndex = 0;
+      renderLibrary();
+      renderStudyCard();
+      showToast("已刪除字卡");
+    }
+
+    function clearAllCards(){
+      if(!confirm("確定要清空全部字卡嗎？")) return;
+      cards = [];
+      saveCards();
+      currentStudyIndex = 0;
+      currentFlipped = false;
+      renderLibrary();
+      renderStudyCard();
+      showToast("已清空全部字卡");
+    }
+
+    toggleFormByType();
+    showPage("home");
+  </script>
+</body>
+</html>
